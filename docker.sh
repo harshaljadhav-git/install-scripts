@@ -1,15 +1,23 @@
 #!/bin/bash
-set e
-echo "Installing Docker"
-# Add Docker's official GPG key:
-sudo apt update
-sudo apt install ca-certificates curl
+set -e
+
+echo "Installing Docker..."
+
+# Update system
+sudo apt update -y
+
+# Install required packages
+sudo apt install -y ca-certificates curl gnupg lsb-release
+
+# Create keyrings directory
 sudo install -m 0755 -d /etc/apt/keyrings
+
+# Download Docker GPG key
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-# Add the repository to Apt sources:
-sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+# Add Docker APT repository
+sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null <<EOF
 Types: deb
 URIs: https://download.docker.com/linux/ubuntu
 Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
@@ -17,9 +25,11 @@ Components: stable
 Signed-By: /etc/apt/keyrings/docker.asc
 EOF
 
-sudo apt update
-sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo systemctl start docker
-sudo systemctl enable docker
-sudo systemctl status docker
+# Install Docker
+sudo apt update -y
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Start & enable Docker
+sudo systemctl enable --now docker
+
 echo "Docker installed successfully!"
